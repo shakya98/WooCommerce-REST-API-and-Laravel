@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Models\User;
+use App\Models\Products;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
@@ -14,6 +15,8 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+
+    //register function
     public function register(Request $request)
     {
         $request->validate([
@@ -39,4 +42,12 @@ class Controller extends BaseController
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    // get woo products function
+    public function getProducts()
+    {
+        $woo_products = Products::get(['id', 'name', 'price', 'description']);
+        return $woo_products;
+    }
+
 }

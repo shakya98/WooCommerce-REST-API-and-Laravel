@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::get('/sync-WooProducts', function () {
     \App\Jobs\SyncWooProductJob::dispatch();
@@ -24,4 +24,10 @@ Route::get('/sync-WooProducts', function () {
 });
 
 Route::post('/register', [\App\Http\Controllers\Controller::class, 'register']);
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/getProducts', [\App\Http\Controllers\Controller::class, 'getProducts']);
+});
+
 
