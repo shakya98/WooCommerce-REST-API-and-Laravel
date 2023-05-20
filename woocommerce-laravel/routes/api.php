@@ -22,3 +22,6 @@ Route::get('/sync-WooProducts', function () {
     \App\Jobs\SyncWooProductJob::dispatch();
     return 'Syncing products from woocommerce shop to the DB...';
 });
+
+Route::post('/register', [\App\Http\Controllers\Controller::class, 'register']);
+
