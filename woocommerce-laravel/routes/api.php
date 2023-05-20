@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/sync-WooProducts', function () {
+    \App\Jobs\SyncWooProductJob::dispatch();
+    return 'Syncing products from woocommerce shop to the DB...';
+});
