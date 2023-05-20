@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Automattic\WooCommerce\Client;
 use Illuminate\Support\Carbon;
 use App\Models\Products;
+use App\Models\Log;
 
 class SyncWooProductJob implements ShouldQueue
 {
@@ -52,22 +53,42 @@ class SyncWooProductJob implements ShouldQueue
         // Getting products according to the requirment
         $products = $woocommerce->get('products', ['per_page' => 10, 'offset' => $this->start]);
 
+        $productsCount = json_decode(json_encode($products), true);
+        $total_woo_products = count($productsCount);
+
+        $total_synced_products = 0;
+
+        $errors = [];
+
         // looping the products into the DB
         foreach ($products as $productData) {
-            Products::updateOrCreate(
-                ['id' => $productData->id],
-                [
-                    'name' => $productData->name,
-                    // 'price' => $productData->regular_price,
-                    'price' => !empty($productData->regular_price) ? $productData->regular_price : null,
-                    'description' => $productData->description,
-                ]
-            );
+            try {
+                Products::updateOrCreate(
+                    ['id' => $productData->id],
+                    [
+                        'name' => $productData->name,
+                        // 'price' => $productData->regular_price,
+                        'price' => !empty($productData->regular_price) ? $productData->regular_price : null,
+                        'description' => $productData->description,
+                    ]
+                );
+                $total_synced_products++;
+            } catch (\Exception $e) {
+                $errors[] = "Error syncing product ID {$productData->id}: {$e->getMessage()}";
+            }
         }
 
         $endTime = microtime(true);
 
         $responseTime = $endTime - $startTime;
+
+        // Log the details
+        Log::create([
+            'total_woo_products' => $total_woo_products,
+            'total_synced_products' => $total_synced_products,
+            'errors' => implode(", ", $errors),
+            'response_time' => $responseTime
+        ]);
 
         // Checking the delay and dispatching next job
         $delay = $this->responseDelay($responseTime);

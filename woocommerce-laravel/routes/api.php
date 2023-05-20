@@ -28,6 +28,7 @@ Route::post('/register', [\App\Http\Controllers\Controller::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/getProducts', [\App\Http\Controllers\Controller::class, 'getProducts']);
+    Route::get('/getLogs', [\App\Http\Controllers\Controller::class, 'getLogs']);
 });
 
 
